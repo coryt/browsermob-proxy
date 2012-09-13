@@ -110,6 +110,19 @@ public class ProxyResource {
     }
 
     @Post
+    @At("/:port/hosts")
+    public Reply<?> mapHosts(@Named("port") int port, Request request) {
+        ProxyServer proxy = proxyManager.get(port);
+        Map<String, String> hosts = request.read(Map.class).as(Json.class);
+        for (Map.Entry<String, String> entry : hosts.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            proxy.remapHost(key, value);
+        }
+        return Reply.saying().ok();
+    }
+
+    @Post
     @At("/:port/headers")
     public Reply<?> updateHeaders(@Named("port") int port, Request request) {
         ProxyServer proxy = proxyManager.get(port);
